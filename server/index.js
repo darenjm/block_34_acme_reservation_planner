@@ -10,10 +10,26 @@ const {
   destroyReservation,
 } = require("./db");
 
+
+const express = require("express");
+const morgan = require("morgan");
+
+const server = express();
+client.connect();
+
 const init = async () => {
   await client.connect();
 };
 console.log("connected to database");
+
+server.get("/api/customer", async (req, res, next) => {
+  try {
+    const users = await fetchCustomer();
+    res.send(customer);
+  } catch (error) {
+    next(error);
+  }
+});
 
 createTables();
 console.log("tables created");

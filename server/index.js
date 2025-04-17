@@ -6,6 +6,7 @@ const {
   createRestaurant,
   fetchRestaurant,
   createReservation,
+  fetchReservation,
   destroyReservation,
 } = require("./db");
 
@@ -44,5 +45,15 @@ const [res1] = await Promise.all([
     customer_id: andy,
   }),
 ]);
+console.log("reservations created");
+
+console.log(await fetchReservation());
+
+await destroyReservation(res1.id, bethany.id);
+console.log("deleted reservation");
+
+console.log(await fetchReservation());
+
+await client.end();
 
 init();

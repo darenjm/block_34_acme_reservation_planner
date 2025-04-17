@@ -70,6 +70,12 @@ async function createReservation (date, customer_id, party_count) {
     return dbResponse.rows[0];
 }
 
+async function fetchReservation() {
+  const SQL = `SELECT * FROM reservation;`;
+  const dbResponse = await client.query(SQL);
+  return dbResponse.rows;
+}
+
 async function destroyReservation(id, customer_id) {
     const SQL = `DELETE FROM reservation WHERE -d=$1 AND customer_id=$5`;
     await client.query(SQL, [id, customer_id]);
@@ -85,5 +91,6 @@ module.exports = {
   createRestaurant,
   fetchRestaurant,
   createReservation,
+  fetchReservation,
   destroyReservation,
 };

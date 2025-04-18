@@ -10,66 +10,57 @@ const {
   destroyReservation,
 } = require("./db");
 
-
 const express = require("express");
 const morgan = require("morgan");
 
 const server = express();
 client.connect();
 
-const init = async () => {
-  await client.connect();
-};
-console.log("connected to database");
+const port = process.env.PORT || 3300;
+server.listen(port, () => console.log(`listening on port ${port}`));
+
+server.use(express.json());
 
 server.get("/api/customer", async (req, res, next) => {
   try {
-    const users = await fetchCustomer();
+    const customer = await fetchCustomer();
     res.send(customer);
   } catch (error) {
     next(error);
   }
 });
+server.get("/api/restaurant", async (req, res, next) => {
+  try {
+    const restaurant = await fetchRestaurant();
+    res.send(restaurant);
+  } catch (error) {
+    next(error);
+  }
+});
+server.get("/api/reservations", async (req, res, next) => {
+  try {
+    const reservations = await fetchReservation();
+    res.send(reservations);
+  } catch (error) {
+    next(error);
+  }
+});
+server.post("/api/customer/:id/reservation", async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const reservations = await createReservation({
+      restaurant_id: req.body.restaurant_id,
+      date: req.body.date,
+      party_count: req.body.party_count,
+      customer_id: req.params.id
+    });
+    res.send(reservations);
+  } catch (error) {
+    next(error);
+  }
+});
 
-createTables();
-console.log("tables created");
-
-const [sally, andy, bethany, nobu, tratorria, pepe] = await Promise.all([
-  createCustomer("Sally"),
-  createCustomer("Andy"),
-  createCustomer("Bethany"),
-  createRestaurant("Nobu"),
-  createRestaurant("Trattoria Pesce Pasta"),
-  createRestaurant("Don Pepe"),
-]);
-console.log("customer and restaurants created");
-
-console.log(await fetchCustomer());
-console.log(await fetchRestaurant());
-
-const [res1] = await Promise.all([
-  createReservation({
-    date: "04/20/2025",
-    party_count: 2,
-    restaurant_id: tratorria.id,
-    customer_id: bethany,
-  }),
-  createReservation({
-    date: "06/17/2025",
-    party_count: 2,
-    restaurant_id: pepe.id,
-    customer_id: andy,
-  }),
-]);
-console.log("reservations created");
-
-console.log(await fetchReservation());
-
-await destroyReservation(res1.id, bethany.id);
-console.log("deleted reservation");
-
-console.log(await fetchReservation());
-
-await client.end();
-
-init();
+//error handling route which returns an object with an error property
+server.use((err, req, res) => {
+  res.status(err.status || 500).send({ error: err.message || err });
+});

@@ -61,7 +61,7 @@ server.post("/api/customer/:id/reservation", async (req, res, next) => {
 });
 
 server.delete(
-  "/api/customer/customer_id/reservation/:id",
+  "/api/customer/:customer_id/reservation/:id",
   async (req, res, next) => {
     try {
       const SQL = `DELETE FROM reservation WHERE id=$1`;

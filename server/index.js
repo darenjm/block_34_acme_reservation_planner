@@ -60,6 +60,19 @@ server.post("/api/customer/:id/reservation", async (req, res, next) => {
   }
 });
 
+server.delete(
+  "/api/customer/:id/reservation/customer_id",
+  async (req, res, next) => {
+    try {
+      const SQL = `DELETE FROM reservation WHERE id=$1`;
+      const response = await client.query(SQL, [req.params.id]);
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 //error handling route which returns an object with an error property
 server.use((err, req, res) => {
   res.status(err.status || 500).send({ error: err.message || err });
